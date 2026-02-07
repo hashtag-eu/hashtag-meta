@@ -7,7 +7,7 @@ namespace HashtagMeta.CLI.Services;
 public class HashtagCalculator {
     private List<FileInfo> _files = [];
 
-    private readonly JsonSerializerOptions _jsonOptions = new() {
+    private static readonly JsonSerializerOptions _jsonOptions = new() {
         AllowTrailingCommas = true,
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
@@ -48,16 +48,27 @@ public class HashtagCalculator {
         return JsonSerializer.Serialize(htdata, _jsonOptions);
     }
 
-    public string CalculateHashtagDataCid(string json) {
-        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(json);
+    public static string? CalculateHashtagDataCid(string fileName) {
+        try {
+            var fi = new FileInfo(fileName);
+            if (fi.Exists) {
+                using var si = fi.OpenRead();
+                var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si);
 
-        if (htData != null) {
-            var dataJson = JsonSerializer.Serialize(htData.Data, _jsonOptions);
-            var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
+                if (htData != null) {
+                    var dataJson = JsonSerializer.Serialize(htData.Data, _jsonOptions);
+                    var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
 
-            htData.Signature = dataCid;
+                    htData.Signature = dataCid;
+                }
+
+                return JsonSerializer.Serialize(htData, _jsonOptions);
+            }
+            return null;
+        } catch (Exception ex) {
+            Console.WriteLine($"Error signing {fileName}:");
+            Console.WriteLine(ex.ToString());
+            return null;
         }
-
-        return JsonSerializer.Serialize(htData, _jsonOptions);
     }
 }

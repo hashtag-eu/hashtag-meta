@@ -36,8 +36,12 @@ public class Program {
                 }
                 break;
             case "sign":
-                //need a folder name as 2nd parameter
+                //need a json file as 2nd parameter
                 if (args.Length > 1) {
+                    var jsonString = HashtagCalculator.CalculateHashtagDataCid(args[1]);
+                    if(!string.IsNullOrEmpty(jsonString)) {
+                        File.WriteAllText(args[1], jsonString);
+                    }
                 } else {
                     Console.WriteLine("Incorrect number of arguments, the init operation needs either a folder or a list of files");
                     exitCode = 1;
