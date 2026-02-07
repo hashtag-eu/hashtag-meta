@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "HashtagMeta.CLI.Init": {
+      "commandName": "Project",
+      "commandLineArgs": "init babbelaar.pdn babbelaar.png babbelaar2.jpg",
+      "workingDirectory": "x:\\test"
+    },
+    "HashtagMeta.CLI.Sign": {
+      "commandName": "Project",
+      "commandLineArgs": "sign hashtag_meta.json",
+      "workingDirectory": "x:\\test"
+    },
+    "HashtagMeta.CLI.Verify": {
+      "commandName": "Project",
+      "commandLineArgs": "verify",
+      "workingDirectory": "x:\\test"
+    }
+  }
+}

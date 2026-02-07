@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="HashtagMeta.csproj" />
+  <Project Path="HashtagMeta.CLI/HashtagMeta.CLI.csproj" />
+  <Project Path="HashtagMeta.Test/HashtagMeta.Test.csproj" />
 </Solution>
