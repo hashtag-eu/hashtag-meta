@@ -1,9 +1,11 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Cid;
+using HashtagMeta.CLI.DnProto;
 using Multiformats.Base;
 
-namespace HashtagMeta.CLI.Helpers; 
+namespace HashtagMeta.CLI.Helpers;
+
 public class JsonFunctions {
     public static string CreateCID(string input) {
         var bytes = Encoding.UTF8.GetBytes(input);
@@ -47,11 +49,19 @@ public class JsonFunctions {
 
         using (var ms = new MemoryStream()) {
             ms.Write([1, 0x55, 0x12]); // version, codec and hashtype 1 , raw SHA256
-            LEB128.WriteLEB128Signed(ms, (long)hashAlg.Hash?.Length);
+            LEB128.WriteLEB128Signed(ms, hashAlg.Hash?.Length ?? 0L);
             ms.Write(hashAlg.Hash);
             cid = Multibase.Encode(MultibaseEncoding.Base32Lower, ms.ToArray());
         }
 
         return cid;
+    }
+
+    public static string CalculateJsonSignature(string json) {
+        var dagCbor = DagCborObject.FromJsonString(json);
+
+        var byteData = dagCbor.ToBytes();
+
+        return calculateCid(byteData);
     }
 }

@@ -3,27 +3,27 @@
 namespace HashtagMeta.CLI.Models; 
 public record HashtagMetaJson {
     [JsonPropertyName("data")]
-    public HashtagData Data { get; set; }
+    public HashtagData? Data { get; set; }
     [JsonPropertyName("sig")]
-    public byte[] Signature { get; set; } = [];
+    public string? Signature { get; set; }
 }
 
 public record HashtagData {
     [JsonPropertyName("issuer")]
-    public string Issuer { get; set; }
+    public string? Issuer { get; set; }
     [JsonPropertyName("tags")]
-    public Dictionary<string, string> Tags { get; set; }
+    public Dictionary<string, string>? Tags { get; set; }
     [JsonPropertyName("source")]
-    public string Source { get; set; }
+    public string? Source { get; set; }
     [JsonPropertyName("sourceCid")]
-    public string SourceCID { get; set; }
+    public string? SourceCID { get; set; }
     [JsonPropertyName("files")]
     public List<HashtagFile> Files { get; set; } = [];
 }
 
 public record HashtagFile {
     [JsonPropertyName("fileName")]
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
     [JsonPropertyName("fileCid")]
-    public string FileCID { get; set; }
+    public string? FileCID { get; set; }
 }

@@ -27,7 +27,7 @@ public class Program {
             case "init":
                 //need a folder name or array of file names as rest of parameters
                 if (args.Length > 1) {
-                    var fi = new HashtagFileInitializer(args[1..]);
+                    var fi = new HashtagCalculator(args[1..]);
                     var jsonString= fi.GetHashtagMetaJson();
                     File.WriteAllText("hashtag_meta.json", jsonString);
                 } else {

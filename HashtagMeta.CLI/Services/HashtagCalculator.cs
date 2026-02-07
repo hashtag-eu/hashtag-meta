@@ -1,11 +1,10 @@
 ﻿using HashtagMeta.CLI.Helpers;
 using HashtagMeta.CLI.Models;
 using System.Text.Json;
-using System.Xml;
 
 namespace HashtagMeta.CLI.Services;
 
-public class HashtagFileInitializer {
+public class HashtagCalculator {
     private List<FileInfo> _files = [];
 
     private readonly JsonSerializerOptions _jsonOptions = new() {
@@ -17,11 +16,11 @@ public class HashtagFileInitializer {
         NewLine = "\x0A"
     };
 
-    public HashtagFileInitializer(IEnumerable<string> fileNames) {
+    public HashtagCalculator(IEnumerable<string> fileNames) {
         _files = [.. fileNames.Select(f => new FileInfo(f))];
     }
 
-    public HashtagFileInitializer(string folderName) {
+    public HashtagCalculator(string folderName) {
         if (Directory.Exists(folderName)) {
             _files = [.. Directory.GetFiles(folderName).Select(f => new FileInfo(f))];
         }
@@ -34,7 +33,7 @@ public class HashtagFileInitializer {
                 Tags = new() { { "key1", "value1" }, { "key2", "value2" } },
                 Source = "https://example.com",
             },
-            Signature = [0x44, 0x55, 0x66]
+            Signature = ""
         };
 
         htdata.Data.SourceCID = JsonFunctions.CreateCID(htdata.Data.Source);
@@ -47,5 +46,18 @@ public class HashtagFileInitializer {
         }
 
         return JsonSerializer.Serialize(htdata, _jsonOptions);
+    }
+
+    public string CalculateHashtagDataCid(string json) {
+        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(json);
+
+        if (htData != null) {
+            var dataJson = JsonSerializer.Serialize(htData.Data, _jsonOptions);
+            var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
+
+            htData.Signature = dataCid;
+        }
+
+        return JsonSerializer.Serialize(htData, _jsonOptions);
     }
 }
