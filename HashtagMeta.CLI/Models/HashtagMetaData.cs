@@ -18,7 +18,7 @@ public record HashtagData {
     [JsonPropertyName("sourceCid")]
     public string? SourceCID { get; set; }
     [JsonPropertyName("files")]
-    public List<HashtagFile> Files { get; set; } = [];
+    public Dictionary<string, string> Files { get; set; } = [];
 }
 
 public record HashtagFile {

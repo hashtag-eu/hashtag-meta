@@ -2,18 +2,18 @@
   "profiles": {
     "HashtagMeta.CLI.Init": {
       "commandName": "Project",
-      "commandLineArgs": "init babbelaar.pdn babbelaar.png babbelaar2.jpg",
-      "workingDirectory": "x:\\test"
+      "commandLineArgs": "init Fillreport.xlsx Loewe.pdf PSTools.zip Wageningen53.jpg",
+      "workingDirectory": "d:\\fm\\testdata"
     },
     "HashtagMeta.CLI.Sign": {
       "commandName": "Project",
       "commandLineArgs": "sign hashtag_meta.json",
-      "workingDirectory": "x:\\test"
+      "workingDirectory": "d:\\fm\\testdata"
     },
     "HashtagMeta.CLI.Verify": {
       "commandName": "Project",
       "commandLineArgs": "verify",
-      "workingDirectory": "x:\\test"
+      "workingDirectory": "d:\\fm\\testdata"
     }
   }
 }

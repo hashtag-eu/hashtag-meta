@@ -3,6 +3,7 @@ using System.Text;
 using Cid;
 using HashtagMeta.CLI.DnProto;
 using Multiformats.Base;
+using Org.Webpki.JsonCanonicalizer;
 
 namespace HashtagMeta.CLI.Helpers;
 
@@ -58,7 +59,11 @@ public class JsonFunctions {
     }
 
     public static string CalculateJsonSignature(string json) {
-        var dagCbor = DagCborObject.FromJsonString(json);
+
+        //canonicalize json
+        var canonicalizer = new JsonCanonicalizer(json);
+        var cannedJson = canonicalizer.GetEncodedString();
+        var dagCbor = DagCborObject.FromJsonString(cannedJson);
 
         var byteData = dagCbor.ToBytes();
 

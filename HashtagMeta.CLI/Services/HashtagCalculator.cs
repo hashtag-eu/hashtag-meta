@@ -41,7 +41,7 @@ public class HashtagCalculator {
         if (_files.Count > 0) {
             foreach (FileInfo file in _files) {
                 var fileCid = JsonFunctions.CreateCID(file);
-                htdata.Data.Files.Add(new() { FileName = file.Name, FileCID = fileCid });
+                htdata.Data.Files.Add(file.Name, fileCid);
             }
         }
 
@@ -53,10 +53,11 @@ public class HashtagCalculator {
             var fi = new FileInfo(fileName);
             if (fi.Exists) {
                 using var si = fi.OpenRead();
+                
                 var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si);
 
                 if (htData != null) {
-                    var dataJson = JsonSerializer.Serialize(htData.Data, _jsonOptions);
+                    var dataJson = JsonSerializer.Serialize(htData.Data);
                     var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
 
                     htData.Signature = dataCid;
