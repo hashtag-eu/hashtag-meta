@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HashtagMeta.CLI.Models; 
+namespace HashtagMeta.CLI.Models;
+
 public record HashtagMetaJson {
     [JsonPropertyName("data")]
     public HashtagData? Data { get; set; }

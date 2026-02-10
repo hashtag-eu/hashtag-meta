@@ -168,7 +168,7 @@ namespace Org.Webpki.JsonCanonicalizer {
             }
         }
 
-        object ParseElement() {
+        object? ParseElement() {
             switch (Scan()) {
                 case LEFT_CURLY_BRACKET:
                     return ParseObject();

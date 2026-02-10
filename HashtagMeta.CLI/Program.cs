@@ -1,4 +1,6 @@
-﻿using HashtagMeta.CLI.Services;
+﻿using CommandLine;
+using CommandLine.Text;
+using HashtagMeta.CLI.Actions;
 using Microsoft.Extensions.Configuration;
 
 namespace HashtagMeta.CLI;
@@ -20,53 +22,73 @@ public class Program {
             .AddEnvironmentVariables();
         var config = configBuilder.Build();
 
-        var option = args.Length > 0 ? args[0].ToLower() : string.Empty;
+        int result;
+        bool wait = false;
+        try {
+            var parserResult = new Parser(c => {
+                c.HelpWriter = null;
+                c.CaseInsensitiveEnumValues = true;
+            }).ParseArguments<CreateActionOptions, CreateKeyPairActionOptions, SignActionOptions, VerifyActionOptions>(args);
 
-        var exitCode = 0;
-        switch (option) {
-            case "init":
-                //need a folder name or array of file names as rest of parameters
-                if (args.Length > 1) {
-                    var fi = new HashtagCalculator(args[1..]);
-                    var jsonString= fi.GetHashtagMetaJson();
-                    File.WriteAllText("hashtag_meta.json", jsonString);
-                } else {
-                    Console.WriteLine("Incorrect number of arguments, the init operation needs either a folder or a list of files");
-                    exitCode = 1;
-                }
-                break;
-            case "sign":
-                //need a json file as 2nd parameter
-                if (args.Length > 1) {
-                    var jsonString = HashtagCalculator.CalculateHashtagDataCid(args[1]);
-                    if(!string.IsNullOrEmpty(jsonString)) {
-                        File.WriteAllText(args[1], jsonString);
-                    }
-                } else {
-                    Console.WriteLine("Incorrect number of arguments, the init operation needs either a folder or a list of files");
-                    exitCode = 1;
-                }
-                break;
-            case "verify":
-                //need a database name as 2nd parameter
-                if (args.Length > 1) {
-                } else {
-                    Console.WriteLine("Incorrect number of arguments, the init operation needs either a folder or a list of files");
-                    exitCode = 1;
-                }
-                break;
-            case "help":
-            default:
-                Console.WriteLine("Usage:");
-                Console.WriteLine(" - htmeta init <folder | [file]>");
-                Console.WriteLine(" - htmeta verify <folder");
-                Console.WriteLine(" - htmeta sign <file>");
-                break;
+            var val = parserResult.Value as ActionOptionsBase;
+            wait = val?.Wait ?? false;
+
+            result = parserResult.MapResult(
+                (CreateActionOptions options) => runCreate(options),
+                (CreateKeyPairActionOptions options) => runCreateKeyPair(options),
+                (SignActionOptions options) => runSign(options),
+                (VerifyActionOptions options) => runVerify(options),
+                errors => showCommandHelp(parserResult, errors)
+            );
+
+        } catch (Exception ex) {
+            Console.WriteLine(ex.ToString());
+            result = 1;
         }
-        #if DEBUG
-        Console.WriteLine("Press key to exit...");
-        Console.ReadKey();
-        #endif
-        return exitCode;
+
+        if (wait) {
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+        }
+        return result;
+    }
+
+    private static int runCreate(CreateActionOptions options) {
+        Console.WriteLine();
+        var action = new CreateAction();
+        return action.Execute(options);
+    }
+
+    private static int runCreateKeyPair(CreateKeyPairActionOptions options) {
+        Console.WriteLine();
+        var action = new CreateKeyPairAction();
+        return action.Execute(options);
+    }
+
+    private static int runSign(SignActionOptions options) {
+        Console.WriteLine();
+        var action = new SignAction();
+        return action.Execute(options);
+    }
+
+    private static int runVerify(VerifyActionOptions options) {
+        Console.WriteLine();
+        var action = new VerifyAction();
+        return action.Execute(options);
+    }
+
+    private static int showCommandHelp(ParserResult<object> parserResult, IEnumerable<Error> errs) {
+        var text = HelpText.AutoBuild(parserResult, h => {
+            h.AdditionalNewLineAfterOption = false;
+            h.Heading = string.Empty;
+            return h;
+        });
+        Console.WriteLine(text);
+
+        var result = -2;
+        if (errs.Any(x => x is HelpRequestedError || x is VersionRequestedError)) {
+            result = -1;
+        }
+        return result;
     }
 }

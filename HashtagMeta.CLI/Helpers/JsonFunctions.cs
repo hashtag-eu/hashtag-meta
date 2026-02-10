@@ -3,7 +3,6 @@ using System.Text;
 using Cid;
 using HashtagMeta.CLI.DnProto;
 using Multiformats.Base;
-using Org.Webpki.JsonCanonicalizer;
 
 namespace HashtagMeta.CLI.Helpers;
 
@@ -38,7 +37,6 @@ public class JsonFunctions {
         return cid;
     }
 
-
     private static string calculateCid(byte[] bytes) {
         string cid = "";
         var hashAlg = SHA256.Create();
@@ -61,12 +59,34 @@ public class JsonFunctions {
     public static string CalculateJsonSignature(string json) {
 
         //canonicalize json
-        var canonicalizer = new JsonCanonicalizer(json);
-        var cannedJson = canonicalizer.GetEncodedString();
-        var dagCbor = DagCborObject.FromJsonString(cannedJson);
+        //      var canonicalizer = new JsonCanonicalizer(json);
+        //      var cannedJson = canonicalizer.GetEncodedString();
+        //      var dagCbor = DagCborObject.FromJsonString(cannedJson);
+        var dagCbor = DagCborObject.FromJsonString(json);
 
         var byteData = dagCbor.ToBytes();
 
         return calculateCid(byteData);
+    }
+
+    public static string CreateKeyPair(string keyType) {
+        var sb = new StringBuilder();
+
+        var generatedKey = KeyPair.Generate(keyType);
+
+        sb.AppendLine("");
+        sb.AppendLine($"Key Type: {generatedKey.KeyTypeName}");
+        sb.AppendLine("");
+        sb.AppendLine("PRIVATE KEY: save this securely (eg, add to password manager)");
+        sb.AppendLine($"        (Multibase syntax) {generatedKey.PrivateKeyMultibase}");
+        sb.AppendLine($"        (Hex syntax) {generatedKey.PrivateKeyHex}");
+        sb.AppendLine("");
+        sb.AppendLine("PUBLIC KEY: share or publish this (eg, in DID document)");
+        sb.AppendLine($"        (DID Key Syntax) {generatedKey.DidKey}");
+        sb.AppendLine($"        (Multibase syntax) {generatedKey.PublicKeyMultibase}");
+        sb.AppendLine($"        (Hex syntax) {generatedKey.PublicKeyHex}");
+        sb.AppendLine("");
+
+        return sb.ToString();
     }
 }

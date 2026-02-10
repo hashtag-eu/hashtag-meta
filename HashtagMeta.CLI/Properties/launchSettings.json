@@ -1,8 +1,13 @@
 {
   "profiles": {
-    "HashtagMeta.CLI.Init": {
+    "HashtagMeta.CLI.Create": {
       "commandName": "Project",
-      "commandLineArgs": "init Fillreport.xlsx Loewe.pdf PSTools.zip Wageningen53.jpg",
+      "commandLineArgs": "create -i Fillreport.xlsx Loewe.pdf PSTools.zip Wageningen53.jpg -v -w",
+      "workingDirectory": "d:\\fm\\testdata"
+    },
+    "HashtagMeta.CLI.CreateKey": {
+      "commandName": "Project",
+      "commandLineArgs": "createkey",
       "workingDirectory": "d:\\fm\\testdata"
     },
     "HashtagMeta.CLI.Sign": {

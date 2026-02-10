@@ -1,5 +1,7 @@
-﻿using HashtagMeta.CLI.Helpers;
+﻿using HashtagMeta.CLI.DnProto;
+using HashtagMeta.CLI.Helpers;
 using HashtagMeta.CLI.Models;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace HashtagMeta.CLI.Services;
@@ -59,7 +61,8 @@ public class HashtagCalculator {
                 if (htData != null) {
                     var dataJson = JsonSerializer.Serialize(htData.Data);
                     var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
-
+                    Console.WriteLine("hashtag_meta.json Data CID:");
+                    Console.WriteLine(dataCid);
                     htData.Signature = dataCid;
                 }
 
@@ -71,5 +74,16 @@ public class HashtagCalculator {
             Console.WriteLine(ex.ToString());
             return null;
         }
+    }
+
+    public static byte[]? SignHashtagDataCid(string privateKey, byte[] value) {
+
+        using var ecdsa = ECDsa.Create(ECCurve.CreateFromFriendlyName("secp256k1"));
+
+
+     //   var publicKey = kp.PublicKeyMultibase;
+
+        
+        return [];
     }
 }

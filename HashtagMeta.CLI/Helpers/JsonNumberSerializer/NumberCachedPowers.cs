@@ -30,7 +30,6 @@
 
 // Ported to C# from the Mozilla "Rhino" project by Anders Rundgren.
 
-using System;
 using System.Diagnostics;
 
 /// <summary>
