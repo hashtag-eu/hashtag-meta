@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="HashtagMeta.CLI/HashtagMeta.CLI.csproj" />
   <Project Path="HashtagMeta.Test/HashtagMeta.Test.csproj" />
 </Solution>
