@@ -17,7 +17,8 @@ public class CreateAction : ActionBase<CreateActionOptions> {
                 hashtagFiles = options.InputFiles;
                 break;
             case InputFileType.CompressedFile:
-                break;
+                Console.WriteLine($"NOT IMPLEMENTED YET, create new Hashtag metadata file from zip file is not yet implemented...");
+                return 4;
             case InputFileType.Folder:
                 //decompress to temp folder and calculate file CIDs
                 var folderName = options.InputFiles.FirstOrDefault() ?? Directory.GetCurrentDirectory();
