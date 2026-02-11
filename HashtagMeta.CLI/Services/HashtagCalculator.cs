@@ -1,22 +1,11 @@
 ﻿using HashtagMeta.CLI.DnProto;
 using HashtagMeta.CLI.Helpers;
 using HashtagMeta.CLI.Models;
-using System.Security.Cryptography;
-using System.Text.Json;
 
 namespace HashtagMeta.CLI.Services;
 
 public class HashtagCalculator {
     private List<FileInfo> _files = [];
-
-    private static readonly JsonSerializerOptions _jsonOptions = new() {
-        AllowTrailingCommas = true,
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        IndentSize = 2,
-        WriteIndented = true,
-        NewLine = "\x0A"
-    };
 
     public HashtagCalculator(IEnumerable<string> fileNames) {
         _files = [.. fileNames.Select(f => new FileInfo(f))];
@@ -28,62 +17,42 @@ public class HashtagCalculator {
         }
     }
 
-    public string GetHashtagMetaJson() {
+    public string CreateHashtagMetaJson() {
         var htdata = new HashtagMetaJson {
             Data = new() {
-                Issuer = "did:something:something",
-                Tags = new() { { "key1", "value1" }, { "key2", "value2" } },
-                Source = "https://example.com",
-            },
-            Signature = ""
+                Issuer = "did:web:user1.test.farmmaps.eu"
+            }
         };
-
-        htdata.Data.SourceCID = JsonFunctions.CreateCID(htdata.Data.Source);
 
         if (_files.Count > 0) {
             foreach (FileInfo file in _files) {
-                var fileCid = JsonFunctions.CreateCID(file);
-                htdata.Data.Files.Add(file.Name, fileCid);
+                var fileCid = HashtagFunctions.CreateCID(file);
+                htdata.Data.Files.Add(file.Name, new() { FileCID = fileCid });
             }
         }
 
-        return JsonSerializer.Serialize(htdata, _jsonOptions);
+        return htdata.ToJson();
     }
 
-    public static string? CalculateHashtagDataCid(string fileName) {
+    public static byte[] SignHashtagData(HashtagData hashtagData, string privateKey, string publicKey) {
         try {
-            var fi = new FileInfo(fileName);
-            if (fi.Exists) {
-                using var si = fi.OpenRead();
-                
-                var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si);
+            var signingFunction = Signer.CreateCommitSigningFunction(privateKey, publicKey);
 
-                if (htData != null) {
-                    var dataJson = JsonSerializer.Serialize(htData.Data);
-                    var dataCid = JsonFunctions.CalculateJsonSignature(dataJson);
-                    Console.WriteLine("hashtag_meta.json Data CID:");
-                    Console.WriteLine(dataCid);
-                    htData.Signature = dataCid;
-                }
+            if (hashtagData != null) {
+                var hash = hashtagData.CalculateDagCborHash();
+                var signedBytes = signingFunction(hash);
 
-                return JsonSerializer.Serialize(htData, _jsonOptions);
+                Console.WriteLine($"Hashtag Data hash: {Convert.ToBase64String(hash)}");
+                Console.WriteLine($"Base64: {Convert.ToBase64String(signedBytes)}");
+                Console.WriteLine($"Base32: {Base32Encoding.BytesToBase32(signedBytes)}");
+
+                return signedBytes;
             }
-            return null;
+            return [];
         } catch (Exception ex) {
-            Console.WriteLine($"Error signing {fileName}:");
+            Console.WriteLine($"Error signing HashtagData object:");
             Console.WriteLine(ex.ToString());
-            return null;
+            return [];
         }
-    }
-
-    public static byte[]? SignHashtagDataCid(string privateKey, byte[] value) {
-
-        using var ecdsa = ECDsa.Create(ECCurve.CreateFromFriendlyName("secp256k1"));
-
-
-     //   var publicKey = kp.PublicKeyMultibase;
-
-        
-        return [];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace HashtagMeta.CLI.Actions;
 
-[Verb("createkeypair", aliases: ["k", "kp"], HelpText = "Create a new Hashtag metadata file from input files or folder.")]
+[Verb("createkeypair", aliases: ["k", "kp", "createkey"], HelpText = "Create a new Hashtag public and private key, optionally in an output file.")]
 public class CreateKeyPairActionOptions : ActionOptionsBase {
-    [Option('o', "output", Default = "hashtag_keys.txt", HelpText = "Output public/private keypair file.")]
+    [Option('o', "output", HelpText = "Optional output public/private keypair file.")]
     public string? OutputFile { get; set; }
 }

@@ -4,12 +4,12 @@ namespace HashtagMeta.CLI.Actions;
 
 [Verb("verify", aliases: ["v"], HelpText = "Verify a Hashtag metadata file using public key.")]
 public class VerifyActionOptions : ActionOptionsBase {
-    [Option('i', "input", Default = "hashtag_meta.json", HelpText = "Input file [hashtag_meta.json]")]
+    [Value(0, MetaName = "Hashtag metadata input file", HelpText = "Input file [hashtag_meta.json] to sign with the provided private/public key pair.")]
     public string InputFile { get; set; } = "hashtag_meta.json";
 
-    [Option('k', "public-key", Default = null, HelpText = "Public key")]
-    public string? PublicKey { get; set; }
+    [Option('k', "public-key", Required = true, HelpText = "Public key (Multibase syntax)")]
+    public string PublicKey { get; set; } = string.Empty;
 
-    [Option('o', "output", Default = "hashtag_verify_report.md", HelpText = "Output file [hashtag_verify_report.md]")]
-    public string OutputFile { get; set; } = "hashtag_verify_report.md";
+    [Option('o', "output", Default = "hashtag_verify.txt", HelpText = "Output file [hashtag_verify.txt]")]
+    public string OutputFile { get; set; } = "hashtag_verify.txt";
 }

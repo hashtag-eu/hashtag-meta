@@ -1,4 +1,4 @@
-namespace Cid;
+namespace HashtagMeta.CLI.Helpers;
 
 /// <summary>
 /// Single-file utility to read and write integers in the LEB128 (7-bit little endian base-128) format.

@@ -1,12 +1,12 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Cid;
-using HashtagMeta.CLI.DnProto;
+﻿using HashtagMeta.CLI.DnProto;
 using Multiformats.Base;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HashtagMeta.CLI.Helpers;
 
-public class JsonFunctions {
+public class HashtagFunctions {
+
     public static string CreateCID(string input) {
         var bytes = Encoding.UTF8.GetBytes(input);
 
@@ -54,19 +54,6 @@ public class JsonFunctions {
         }
 
         return cid;
-    }
-
-    public static string CalculateJsonSignature(string json) {
-
-        //canonicalize json
-        //      var canonicalizer = new JsonCanonicalizer(json);
-        //      var cannedJson = canonicalizer.GetEncodedString();
-        //      var dagCbor = DagCborObject.FromJsonString(cannedJson);
-        var dagCbor = DagCborObject.FromJsonString(json);
-
-        var byteData = dagCbor.ToBytes();
-
-        return calculateCid(byteData);
     }
 
     public static string CreateKeyPair(string keyType) {

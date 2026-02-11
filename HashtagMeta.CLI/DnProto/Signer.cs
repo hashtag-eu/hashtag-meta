@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace HashtagMeta.CLI.DnProto;
@@ -9,75 +8,12 @@ namespace HashtagMeta.CLI.DnProto;
 /// </summary>
 public static class Signer {
     /// <summary>
-    /// Signs a CID byte array using a private key
-    /// </summary>
-    /// <returns>A signed byte array</returns>
-    public static byte[]? SignHash(string publicKey, string privateKey, byte[] cid) {
-
-        // Try to parse as RSA key first, then fall back to ECDSA
-        bool isHexFormat = !privateKey.Contains("-----BEGIN");
-
-        try {
-            if (isHexFormat) {
-                // Hex format - raw key bytes, assume ECDSA P-256
-                var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-                var privateKeyBytes = Convert.FromHexString(privateKey);
-                var publicKeyBytes = Convert.FromHexString(publicKey);
-
-                // Handle compressed or uncompressed public key
-                ECPoint publicPoint;
-                if (publicKeyBytes.Length == 33 && (publicKeyBytes[0] == 0x02 || publicKeyBytes[0] == 0x03)) {
-                    // Compressed format (0x02/0x03 + 32-byte X)
-                    // Decompress by computing Y from the curve equation
-                    var x = publicKeyBytes.Skip(1).Take(32).ToArray();
-                    var y = DecompressPublicKey(x, publicKeyBytes[0] == 0x03);
-                    publicPoint = new ECPoint { X = x, Y = y };
-                } else if (publicKeyBytes.Length == 65 && publicKeyBytes[0] == 0x04) {
-                    // Uncompressed format (0x04 + 32-byte X + 32-byte Y)
-                    publicPoint = new ECPoint {
-                        X = [.. publicKeyBytes.Skip(1).Take(32)],
-                        Y = [.. publicKeyBytes.Skip(33).Take(32)]
-                    };
-                } else {
-                    throw new InvalidOperationException("Invalid public key format. Expected 33-byte compressed or 65-byte uncompressed key.");
-                }
-
-                var parameters = new ECParameters {
-                    Curve = ECCurve.NamedCurves.nistP256,
-                    D = privateKeyBytes,
-                    Q = publicPoint
-                };
-
-                ecdsa.ImportParameters(parameters);
-
-                // Test signature to verify format and S-normalization
-                var testData = new byte[] { 0x01, 0x02, 0x03 };
-                var testHash = SHA256.HashData(testData);
-                var testSig = ecdsa.SignHash(testHash, DSASignatureFormat.IeeeP1363FixedFieldConcatenation);
-                var normalizedTestSig = NormalizeLowS(testSig, ECCurve.NamedCurves.nistP256);
-                Console.WriteLine($"SignToken: Test signature length={testSig.Length}, normalized={testSig.SequenceEqual(normalizedTestSig)}, first 8 bytes={Convert.ToHexString([.. normalizedTestSig.Take(8)])}");
-
-                // Try ECDSA
-                //var ecdsa = ECDsa.Create();
-                //ecdsa.ImportFromPem(privateKey);
-
-                var signedBytes = ecdsa.SignHash(cid);
-                return signedBytes;
-            }
-        } catch (Exception ex) {
-            throw new InvalidOperationException("Failed to import private key. Ensure it's in valid PEM or hex format.", ex);
-        }
-        return null;
-    }
-
-    /// <summary>
     /// Validates an incoming byte array.
     /// Caller needs to look up user's public key in did doc.
     /// </summary>
     /// <returns>true if valid, false if validation fails</returns>
-    public static bool ValidateHash(string issuerPublicKey, byte[] signedHash) {
+    public static bool ValidateHash(string issuerPublicKey, byte[] hash, byte[] signature) {
         try {
-
             // Determine format: multibase (starts with 'z'), PEM (contains -----BEGIN), or hex
             if (issuerPublicKey.StartsWith('z')) {
                 // Multibase format (from DID document)
@@ -114,15 +50,7 @@ public static class Signer {
                 };
 
                 ecdsa.ImportParameters(parameters);
-            } else if (issuerPublicKey.Contains("-----BEGIN")) {
-                // PEM format - try RSA first, then ECDSA
-                try {
-                    var rsa = RSA.Create();
-                    rsa.ImportFromPem(issuerPublicKey);
-                } catch {
-                    var ecdsa = ECDsa.Create();
-                    ecdsa.ImportFromPem(issuerPublicKey);
-                }
+                return ecdsa.VerifyHash(hash, signature);
             } else {
                 // Hex format - assume ECDSA P-256
                 var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
@@ -149,10 +77,8 @@ public static class Signer {
                 };
 
                 ecdsa.ImportParameters(parameters);
+                return ecdsa.VerifyHash(hash, signature);
             }
-            //check value
-            return true;
-
         } catch (Exception ex) {
             Console.WriteLine($"JWT validation failed: {ex.Message}");
             return false;
@@ -164,15 +90,15 @@ public static class Signer {
     /// </summary>
     private static byte[] DecompressPublicKey(byte[] x, bool isOdd) {
         // P-256 curve parameters
-        var p = System.Numerics.BigInteger.Parse("115792089210356248762697446949407573530086143415290314195533631308867097853951");
-        var a = System.Numerics.BigInteger.Parse("115792089210356248762697446949407573530086143415290314195533631308867097853948");
-        var b = System.Numerics.BigInteger.Parse("41058363725152142129326129780047268409114441015993725554835256314039467401291");
+        var p = BigInteger.Parse("115792089210356248762697446949407573530086143415290314195533631308867097853951");
+        var a = BigInteger.Parse("115792089210356248762697446949407573530086143415290314195533631308867097853948");
+        var b = BigInteger.Parse("41058363725152142129326129780047268409114441015993725554835256314039467401291");
 
         // Convert X to BigInteger
-        var xInt = new System.Numerics.BigInteger(x, isUnsigned: true, isBigEndian: true);
+        var xInt = new BigInteger(x, isUnsigned: true, isBigEndian: true);
 
         // Compute Y^2 = X^3 + aX + b (mod p)
-        var ySquared = (System.Numerics.BigInteger.ModPow(xInt, 3, p) + a * xInt + b) % p;
+        var ySquared = (BigInteger.ModPow(xInt, 3, p) + a * xInt + b) % p;
 
         // Compute Y = sqrt(Y^2) mod p using Tonelli-Shanks
         var y = ModSqrt(ySquared, p);
@@ -196,9 +122,9 @@ public static class Signer {
     /// <summary>
     /// Computes modular square root using Tonelli-Shanks algorithm for P-256 prime.
     /// </summary>
-    private static System.Numerics.BigInteger ModSqrt(System.Numerics.BigInteger a, System.Numerics.BigInteger p) {
+    private static BigInteger ModSqrt(BigInteger a, BigInteger p) {
         // For P-256, p ≡ 3 (mod 4), so we can use the simple formula: sqrt(a) = a^((p+1)/4) mod p
-        return System.Numerics.BigInteger.ModPow(a, (p + 1) / 4, p);
+        return BigInteger.ModPow(a, (p + 1) / 4, p);
     }
 
     /// <summary>

@@ -6,11 +6,13 @@ namespace HashtagMeta.CLI.Actions;
 public class CreateKeyPairAction:ActionBase<CreateKeyPairActionOptions> {
 
     public override int Execute(CreateKeyPairActionOptions options) {
-        var keyInfo = JsonFunctions.CreateKeyPair(KeyTypes.Secp256k1);
+        var keyInfo = HashtagFunctions.CreateKeyPair(KeyTypes.P256);
 
         Console.WriteLine(keyInfo);
 
-        File.WriteAllText("hashtag_keys.txt", keyInfo);
+        if (options.OutputFile != null) {
+            File.WriteAllText(options.OutputFile, keyInfo);
+        }
 
         return 0;
     }

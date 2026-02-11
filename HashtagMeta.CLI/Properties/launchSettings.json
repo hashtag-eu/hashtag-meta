@@ -2,23 +2,23 @@
   "profiles": {
     "HashtagMeta.CLI.Create": {
       "commandName": "Project",
-      "commandLineArgs": "create -i Fillreport.xlsx Loewe.pdf PSTools.zip Wageningen53.jpg -v -w",
-      "workingDirectory": "d:\\fm\\testdata"
+      "commandLineArgs": "create -i . -t Folder -fvw",
+      "workingDirectory": ""
     },
     "HashtagMeta.CLI.CreateKey": {
       "commandName": "Project",
-      "commandLineArgs": "createkey",
-      "workingDirectory": "d:\\fm\\testdata"
+      "commandLineArgs": "createkey -vw",
+      "workingDirectory": ""
     },
     "HashtagMeta.CLI.Sign": {
       "commandName": "Project",
-      "commandLineArgs": "sign hashtag_meta.json",
-      "workingDirectory": "d:\\fm\\testdata"
+      "commandLineArgs": "sign hashtag_meta.json -p z42tiCpEtJnq8G8TkGQU2ibhsah3FwxLQWcAngano8GhEQVm -k zDnaeXViy7xZj5bxBjh3LHeGQ84yr2aFaA52ZNcM1QfnfRtZU -vw",
+      "workingDirectory": ""
     },
     "HashtagMeta.CLI.Verify": {
       "commandName": "Project",
-      "commandLineArgs": "verify",
-      "workingDirectory": "d:\\fm\\testdata"
+      "commandLineArgs": "verify hashtag_meta.json -k zDnaeXViy7xZj5bxBjh3LHeGQ84yr2aFaA52ZNcM1QfnfRtZU -vw",
+      "workingDirectory": ""
     }
   }
 }
