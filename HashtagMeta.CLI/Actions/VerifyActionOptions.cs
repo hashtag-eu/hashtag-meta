@@ -9,7 +9,4 @@ public class VerifyActionOptions : ActionOptionsBase {
 
     [Option('k', "public-key", Required = true, HelpText = "Public key (Multibase syntax)")]
     public string PublicKey { get; set; } = string.Empty;
-
-    [Option('o', "output", Default = "hashtag_verify.txt", HelpText = "Output file [hashtag_verify.txt]")]
-    public string OutputFile { get; set; } = "hashtag_verify.txt";
 }
