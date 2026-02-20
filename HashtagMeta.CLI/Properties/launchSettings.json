@@ -5,6 +5,11 @@
       "commandLineArgs": "create -i . -t Folder -fvw",
       "workingDirectory": ""
     },
+    "HashtagMeta.CLI.CreateZip": {
+      "commandName": "Project",
+      "commandLineArgs": "create x:\\HASHTAG1.txt -i x:\\Tasks_2026-02-11_14-11-29.zip -t Zip -fvw",
+      "workingDirectory": ""
+    },
     "HashtagMeta.CLI.CreateKey": {
       "commandName": "Project",
       "commandLineArgs": "createkey -vw",

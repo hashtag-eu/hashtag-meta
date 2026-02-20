@@ -1,0 +1,6 @@
+{
+  "test": "This is some JSON",
+  "amount": 32,
+  "valid": true,
+  "values": [ 1, 54, 6, 43 ]
+}

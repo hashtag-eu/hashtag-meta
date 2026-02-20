@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 /// <summary>
 /// Just some helpers for working with json.

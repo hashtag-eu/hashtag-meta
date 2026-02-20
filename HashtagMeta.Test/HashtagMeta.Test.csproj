@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HashtagMeta.CLI\HashtagMeta.CLI.csproj" />
+    <ProjectReference Include="..\HashtagMeta.Core\HashtagMeta.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +38,36 @@
     </None>
     <None Update="Resources\Files\Individuals.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\testtasks.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\file1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\readme.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\test.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\test.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\Test\testdata.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\SignTests\signature-fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\SignTests\w3c_didkey_K256.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\SignTests\w3c_didkey_P256.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

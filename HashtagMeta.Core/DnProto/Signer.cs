@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 /// <summary>
 /// Signs and validates JWT tokens using RSA or ECDSA cryptographic keys.

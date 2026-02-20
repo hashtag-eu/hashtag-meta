@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 /// <summary>
 /// Represents a cid in atproto. Only cid version 1 is supported.

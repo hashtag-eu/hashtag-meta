@@ -1,8 +1,9 @@
-﻿using HashtagMeta.CLI.DnProto;
-using HashtagMeta.CLI.Helpers;
-using HashtagMeta.CLI.Models;
+﻿using HashtagMeta.Core.DnProto;
+using HashtagMeta.Core.Helpers;
+using HashtagMeta.Core.Models;
+using System.Text.Json;
 
-namespace HashtagMeta.CLI.Services;
+namespace HashtagMeta.Core.Services;
 
 public class HashtagCalculator {
     private List<FileInfo> _files = [];
@@ -17,21 +18,20 @@ public class HashtagCalculator {
         }
     }
 
-    public string CreateHashtagMetaJson() {
-        var htdata = new HashtagMetaJson {
-            Data = new() {
-                Issuer = "did:web:user1.test.farmmaps.eu"
-            }
-        };
+    public HashtagData CreateHashtagData(string? dataJson = null) {
+
+        HashtagData data = dataJson != null
+            ? JsonSerializer.Deserialize<HashtagData>(dataJson) ?? new()
+            : new();
 
         if (_files.Count > 0) {
             foreach (FileInfo file in _files) {
                 var fileCid = HashtagFunctions.CreateCID(file);
-                htdata.Data.Files.Add(file.Name, new() { FileCID = fileCid });
+                data.Files.Add(file.Name, new() { FileCID = fileCid });
             }
         }
 
-        return htdata.ToJson();
+        return data;
     }
 
     public static byte[] SignHashtagData(HashtagData hashtagData, string privateKey, string publicKey) {

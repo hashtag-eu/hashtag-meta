@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 
 /// <summary>

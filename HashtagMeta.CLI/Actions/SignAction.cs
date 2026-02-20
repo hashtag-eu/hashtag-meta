@@ -1,6 +1,6 @@
-﻿using HashtagMeta.CLI.Helpers;
-using HashtagMeta.CLI.Models;
-using HashtagMeta.CLI.Services;
+﻿using HashtagMeta.Core.Helpers;
+using HashtagMeta.Core.Models;
+using HashtagMeta.Core.Services;
 
 namespace HashtagMeta.CLI.Actions;
 

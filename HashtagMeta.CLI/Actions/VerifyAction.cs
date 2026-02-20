@@ -1,6 +1,6 @@
-﻿using HashtagMeta.CLI.DnProto;
-using HashtagMeta.CLI.Helpers;
-using HashtagMeta.CLI.Models;
+﻿using HashtagMeta.Core.DnProto;
+using HashtagMeta.Core.Helpers;
+using HashtagMeta.Core.Models;
 
 namespace HashtagMeta.CLI.Actions;
 

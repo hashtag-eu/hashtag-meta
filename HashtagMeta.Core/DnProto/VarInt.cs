@@ -1,4 +1,4 @@
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 /// <summary>
 /// In CAR files, several values are stored as variable-length integers (varints).

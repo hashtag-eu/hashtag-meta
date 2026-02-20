@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 public class KeyPair {
     public required string KeyType { get; set; }

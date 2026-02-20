@@ -4,5 +4,6 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="HashtagMeta.CLI/HashtagMeta.CLI.csproj" />
+  <Project Path="HashtagMeta.Core/HashtagMeta.Core.csproj" Id="7eef291d-d7f0-4c54-9af3-3b2bd80a719f" />
   <Project Path="HashtagMeta.Test/HashtagMeta.Test.csproj" />
 </Solution>

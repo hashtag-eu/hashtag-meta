@@ -13,4 +13,5 @@ public class SignActionOptions : ActionOptionsBase {
 
     [Option('k', "public-key", Required = true, HelpText = "Public key (Multibase syntax)")]
     public string PublicKey { get; set; } = string.Empty;
+
 }

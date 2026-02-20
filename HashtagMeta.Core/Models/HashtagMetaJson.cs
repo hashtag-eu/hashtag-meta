@@ -1,9 +1,9 @@
-﻿using HashtagMeta.CLI.DnProto;
+﻿using HashtagMeta.Core.DnProto;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace HashtagMeta.CLI.Models;
+namespace HashtagMeta.Core.Models;
 
 
 public record HashtagMetaJson {
@@ -26,11 +26,11 @@ public record HashtagMetaJson {
 
     public static HashtagMetaJson? FromJson(FileInfo fi) {
         using var si = fi.OpenRead();
-        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si, HashtagSerializeOptions);
+        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si);
         return htData;
     }
     public static HashtagMetaJson? FromJson(string s) {
-        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(s, HashtagSerializeOptions);
+        var htData = JsonSerializer.Deserialize<HashtagMetaJson>(s);
         return htData;
     }
 }

@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text;
 
-namespace HashtagMeta.CLI.DnProto;
+namespace HashtagMeta.Core.DnProto;
 
 /// <summary>
 /// Provides Base58BTC encoding functionality using the Bitcoin alphabet.

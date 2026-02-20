@@ -3,8 +3,9 @@
 namespace HashtagMeta.CLI.Actions;
 
 public enum InputFileType {
+    Auto,
     Files,
-    CompressedFile,
+    Zip,
     Folder
 }
 
