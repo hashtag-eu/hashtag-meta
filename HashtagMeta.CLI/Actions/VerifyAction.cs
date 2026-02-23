@@ -1,78 +1,82 @@
-﻿using HashtagMeta.Core.DnProto;
-using HashtagMeta.Core.Helpers;
+﻿using HashtagMeta.Core.Helpers;
 using HashtagMeta.Core.Models;
+using System.IO.Compression;
 
 namespace HashtagMeta.CLI.Actions;
 
 public class VerifyAction : ActionBase<VerifyActionOptions> {
     public override int Execute(VerifyActionOptions options) {
-        var inputFile = new FileInfo(options.InputFile);
+        try {
+            string tempFolderName = Path.Combine(Path.GetTempPath(), $"hashtag-{Guid.NewGuid().ToString("D")[..8]}");
 
-        if (inputFile.Exists) {
-            var htData = HashtagMetaJson.FromJson(inputFile);
+            DirectoryInfo? dataFolder = null;
 
-            if (htData != null) {
-                //get the calculated hash code from the data element
-                var hash = htData.Data.CalculateDagCborHash();
+            var inputFileType = DetermineInputFileType(options.InputFileType, [.. options.InputFiles]);
+            switch (inputFileType) {
+                case InputFileType.Zip:
+                    //decompress to temp folder and calculate file CIDs
+                    string? zipFile = null;
+                    try {
+                        zipFile = options.InputFiles.FirstOrDefault();
+                        dataFolder = new DirectoryInfo(tempFolderName);
+                        dataFolder.Create();
 
-                var verified = Signer.ValidateHash(options.PublicKey, hash, htData.Signature);
+                        using var zip = ZipFile.OpenRead(zipFile ?? "");
+                        zip.ExtractToDirectory(dataFolder.FullName, overwriteFiles: true);
 
-                if (!verified) {
-                    Console.WriteLine("The Hashtag data hash cannot be verified with the provided public key");
+                    } catch (Exception ex) {
+                        Console.WriteLine($"Error opening zip file '{zipFile}':");
+                        Console.WriteLine(ex.Message);
+                        return 3;
+                    }
+                    break;
+                case InputFileType.Files:
+                case InputFileType.Folder:
+                    //Calculate file CIDs for files in the folder
+                    var folderName = options.InputFiles.FirstOrDefault() ?? Directory.GetCurrentDirectory();
+                    dataFolder = new DirectoryInfo(folderName);
+                    break;
+                default:
+                    break;
+            }
+
+            if (dataFolder != null && dataFolder.Exists) {
+                //verify metadata json
+                var inputFile = new FileInfo(Path.Combine(dataFolder.FullName, options.MetadataFile));
+                var htJson = HashtagMetaJson.FromJsonFile(inputFile);
+                if (htJson == null) {
+                    Console.WriteLine($"'{inputFile.FullName}' is not a valid hashtag metadata file.");
                     return 2;
                 }
 
-                var errors = new List<string>();
-                //verify source and file CIDs
-                //verify source CID
-                if (htData.Data.Source != null) {
-                    Console.Write("Checking source CID: ");
-                    var sourceCid = HashtagFunctions.CreateCID(htData.Data.Source);
-
-                    if (sourceCid == htData.Data.SourceCID) {
-                        Console.WriteLine("Passed");
-                    } else {
-                        Console.WriteLine("Failed");
-                        errors.Add($"Source: calculated CID does not match source CID in metadata.");
-                    }
+                //verify folder
+                var valid = htJson.ValidateAll(
+                    options.PublicKey,
+                    out var errors,
+                    dataFolder.FullName
+                );
+                if (!valid) {
+                    Console.WriteLine($"'{inputFile.FullName}' is not valid:");
+                    Console.WriteLine(string.Join('\n', errors.Select(e => $"  - {e}")));
+                    return 4;
                 }
-
-                foreach (var f in htData.Data.Files) {
-                    try {
-                        var fi = new FileInfo(Path.Combine(inputFile.DirectoryName ?? "", f.Key));
-                        Console.Write($"Checking file CID for {f.Key}: ");
-                        if (fi.Exists) {
-                            var cid = HashtagFunctions.CreateCID(fi);
-
-                            if (cid == f.Value.FileCID) {
-                                Console.WriteLine("Passed");
-                            } else {
-                                errors.Add($"File {fi.FullName}: calculated CID does not match file CID in metadata.");
-                                Console.WriteLine("Failed");
-                            }
-                        } else {
-                            errors.Add($"File {fi.FullName} does not exist.");
-                            Console.WriteLine("Failed");
-                        }
-                    } catch (Exception ex) {
-                        errors.Add($"File {f.Key}: exception verifying file CID:");
-                        errors.Add(ex.Message);
-                        Console.WriteLine("Failed");
-                    }
-                }
-
-                if (errors.Count > 0) {
-                    Console.WriteLine("Checking the CIDs of the metadata content failed:");
-                    Console.WriteLine(string.Join(Environment.NewLine, errors));
-                    return 3;
-                }
-                Console.WriteLine();
-                Console.WriteLine($"File {options.InputFile} is valid!");
-
-                return 0;
             }
+
+            if (inputFileType == InputFileType.Zip && Directory.Exists(tempFolderName)) {
+                try {
+                    Directory.Delete(tempFolderName, true);
+                } catch (Exception ex) {
+                    Console.WriteLine($"Removing temp folder '{tempFolderName}' failed:");
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            Console.WriteLine($"Validation succeeded!");
+            return 0;
+        } catch (Exception ex) {
+            Console.WriteLine($"Error verifying '{options.MetadataFile}':");
+            Console.WriteLine(ex.Message);
+            return 1;
         }
-        Console.WriteLine($"Input file '{options.InputFile}' is not a valid Hashtag metadata input file.");
-        return 1;
     }
 }

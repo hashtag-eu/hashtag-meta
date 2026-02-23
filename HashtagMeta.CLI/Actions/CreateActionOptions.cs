@@ -11,10 +11,10 @@ public class CreateActionOptions: ActionOptionsBase {
     [Option('i', "input", Separator = ' ', Required = true, HelpText = "Provide a folder name, compressed file name or list of files to create the Hashtag metadata for.")]
     public IEnumerable<string> InputFiles { get; set; } = [];
 
-    [Option('t', "type", Default = InputFileType.Files, HelpText = "Specify the type of input file: 'Files', 'Folder' or 'Zip' (Default 'Auto' based on input)")]
-    public InputFileType InputFileType { get; set; } = InputFileType.Auto;
+    [Option('t', "type", Default = InputFileType.Auto, HelpText = "Specify the type of input: 'Files', 'Folder' or 'Zip' (Default 'Auto' based on input)")]
+    public InputFileType InputFileType { get; set; }
 
-    [Option('f', "force", Default = false, HelpText = "Force creation of the hashtag metadata file, overwrite existing file.")]
+    [Option('f', "force", Default = false, HelpText = "Force creation of the hashtag metadata or zip file, overwrite existing file.")]
     public bool Force { get; set; } = false;
 
     [Option('d', "data", HelpText = "Initial data block contents for the metadata file.")]
@@ -26,7 +26,7 @@ public class CreateActionOptions: ActionOptionsBase {
     [Option('k', "public-key", Required = false, HelpText = "Public key (Multibase syntax)")]
     public string? PublicKey { get; set; } = null;
 
-    [Option('z', "zip-output", Required = false, HelpText = "Create signed output zip file of the contents including the metadata file.")]
+    [Option('z', "create-zip", Required = false, HelpText = "Create signed output zip file of the contents including the metadata file.")]
     public string? ZipOutputFile { get; set; } = null;
 
 }

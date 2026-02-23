@@ -10,7 +10,7 @@ public class HashtagFunctions {
     public static string CreateCID(string input) {
         var bytes = Encoding.UTF8.GetBytes(input);
 
-        return calculateCid(bytes);
+        return CalculateCid(bytes);
     }
 
     public static string CreateCID(FileInfo inputFile) {
@@ -19,40 +19,32 @@ public class HashtagFunctions {
             return string.Empty;
         }
 
-        string cid = "";
-
         var hashAlg = SHA256.Create();
         byte[] hashValue;
         using (Stream s = inputFile.OpenRead()) {
             hashValue = hashAlg.ComputeHash(s);
         }
-
-        using (var ms = new MemoryStream()) {
-            ms.Write([1, 0x55, 0x12]); // version, codec and hashtype 1 , raw SHA256
-            LEB128.WriteLEB128Signed(ms, hashValue.Length);
-            ms.Write(hashValue);
-            cid = Multibase.Encode(MultibaseEncoding.Base32Lower, ms.ToArray());
-        }
-
-        return cid;
+        return WriteCid(hashValue);
     }
 
-    private static string calculateCid(byte[] bytes) {
-        string cid = "";
+    public static string CalculateCid(byte[] bytes) {
         var hashAlg = SHA256.Create();
 
         using (var cs = new CryptoStream(Stream.Null, hashAlg, CryptoStreamMode.Write)) {
             cs.Write(bytes);
             cs.FlushFinalBlock();
         }
+        return WriteCid(hashAlg.Hash);
+    }
 
+    private static string WriteCid(byte[]? hash) {
+        string cid = "";
         using (var ms = new MemoryStream()) {
             ms.Write([1, 0x55, 0x12]); // version, codec and hashtype 1 , raw SHA256
-            LEB128.WriteLEB128Signed(ms, hashAlg.Hash?.Length ?? 0L);
-            ms.Write(hashAlg.Hash);
+            LEB128.WriteLEB128Signed(ms, hash?.Length ?? 0L);
+            ms.Write(hash);
             cid = Multibase.Encode(MultibaseEncoding.Base32Lower, ms.ToArray());
         }
-
         return cid;
     }
 

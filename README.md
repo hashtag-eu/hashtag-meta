@@ -35,8 +35,12 @@ Syntax: `./htmeta.exe c(reate) [filename] -i <files|folder|zip> [-t|-f]`
 |-|-|
 |[filename]|specify file name of metadata file (default `hashtag_meta.json`)|
 |-i, --input (required)|List of file names, folder name or zip file name|
-|-t, --type|Type of input `Files|Folder|Zip`, default `Files`|
+|-t, --type|Type of input `Auto|Files|Folder|Zip`, default `Auto`|
 |-f, --force|Force create the hashtag_meta json file, overwrite existing file|
+|-d, --data|Hashtag Data Json string to initialize the data block|
+|-p, --private-key|Private key to use to sign (multibase syntax)|
+|-k, --public-key|Public key to use to sign (multibase syntax)|
+|-z, --create-zip|Create signed output zip file of the contents including the metadata file|
 
 
 ### `Create key pair` options
@@ -69,4 +73,7 @@ Syntax: `./htmeta.exe verify [hashtag_meta.json] -k <public-key>`
 
 |Option|Description|
 |-|-|
+|[filename]|specify file name of metadata file (default `hashtag_meta.json`)|
 |-k, --public-key|Public key in multibase syntax, to check the input hashtag metadata file with|
+|-t, --type|Type of input `Auto|Files|Folder|Zip`, default `Auto`|
+|-i, --input (required)|List of file names, folder name or zip file name|

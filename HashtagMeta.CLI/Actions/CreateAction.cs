@@ -1,5 +1,4 @@
-﻿using HashtagMeta.Core.Models;
-using HashtagMeta.Core.Services;
+﻿using HashtagMeta.Core.Services;
 using System.IO.Compression;
 
 namespace HashtagMeta.CLI.Actions;
@@ -7,16 +6,11 @@ namespace HashtagMeta.CLI.Actions;
 public class CreateAction : ActionBase<CreateActionOptions> {
     public override int Execute(CreateActionOptions options) {
 
-        //check whether output file exists
-        if (!options.Force && File.Exists(options.MetadataFile)) {
-            Console.WriteLine($"Can't create new Hashtag metadata file '{options.MetadataFile}', it already exists.");
-            return 1;
-        }
-
         string tempFolderName = Path.Combine(Path.GetTempPath(), $"hashtag-{Guid.NewGuid().ToString("D")[..8]}");
 
         IEnumerable<string> hashtagFiles = [];
-        switch (options.InputFileType) {
+        var inputFileType = DetermineInputFileType(options.InputFileType, [.. options.InputFiles]);
+        switch (inputFileType) {
             case InputFileType.Files:
                 hashtagFiles = options.InputFiles;
                 break;
@@ -45,11 +39,11 @@ public class CreateAction : ActionBase<CreateActionOptions> {
             case InputFileType.Folder:
                 //Calculate file CIDs for files in the folder
                 var folderName = options.InputFiles.FirstOrDefault() ?? Directory.GetCurrentDirectory();
-                var fi = new DirectoryInfo(folderName);
-                if (fi.Exists) {
+                var di = new DirectoryInfo(folderName);
+                if (di.Exists) {
                     //Get all files of current directory except
                     //hashtag metadata file to write to
-                    hashtagFiles = fi.GetFiles()
+                    hashtagFiles = di.GetFiles()
                         .Where(f => !f.Name.Equals(options.MetadataFile, StringComparison.OrdinalIgnoreCase))
                         .Select(f => f.FullName);
                 }
@@ -59,16 +53,38 @@ public class CreateAction : ActionBase<CreateActionOptions> {
         }
 
         if (hashtagFiles.Any()) {
-            var fi = new HashtagCalculator(hashtagFiles);
 
-            var htMeta = new HashtagMetaJson { Data = fi.CreateHashtagData() };
-            var htMetaJson = htMeta.ToJson();
-            Console.WriteLine($"New metadata file created [{options.MetadataFile}]:");
-            Console.WriteLine();
-            Console.WriteLine(htMetaJson);
-            File.WriteAllText(options.MetadataFile, htMetaJson);
+            var htc = new HashtagCalculator([.. hashtagFiles]);
 
-            if (options.InputFileType == InputFileType.Zip && Directory.Exists(tempFolderName)) {
+            if (options.ZipOutputFile != null && options.PrivateKey != null && options.PublicKey != null) {
+                //delete existing if overwriting
+                if (File.Exists(options.ZipOutputFile) && options.Force) {
+                    File.Delete(options.ZipOutputFile);
+                }
+
+                //Create a zip file with the signed hashtag metadata file and the input files to the file path specified
+                var zipfile = htc.CreateSignedHashtagZipfile(
+                    options.ZipOutputFile,
+                    options.Data,
+                    options.PrivateKey,
+                    options.PublicKey,
+                    options.MetadataFile
+                );
+                Console.WriteLine($"Zip file with signed metadata created ({zipfile.FullName})");
+
+            } else {
+                var htMeta = options.PrivateKey != null && options.PublicKey != null
+                    ? htc.CreateSignedHashtagJson(options.Data, options.PrivateKey, options.PublicKey)
+                    : new() { Data = htc.CreateHashtagData() };
+
+                var htMetaJson = htMeta.ToJson();
+                Console.WriteLine($"New metadata file created [{options.MetadataFile}]:");
+                Console.WriteLine();
+                Console.WriteLine(htMetaJson);
+                File.WriteAllText(options.MetadataFile, htMetaJson);
+            }
+
+            if (inputFileType == InputFileType.Zip && Directory.Exists(tempFolderName)) {
                 try {
                     Directory.Delete(tempFolderName, true);
                 } catch (Exception ex) {

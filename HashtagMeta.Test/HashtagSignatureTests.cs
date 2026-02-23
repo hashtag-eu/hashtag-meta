@@ -28,5 +28,15 @@ namespace HashtagMeta.Test {
                 //Assert.AreEqual(test.ValidSignature, valid);
             }
         }
+
+        [TestMethod]
+        public void CreatePrivatePublicKeypairTest() {
+            var keyPair = KeyPair.Generate(KeyTypes.P256);
+
+            Assert.AreEqual(KeyTypes.P256.ToString(), keyPair.KeyType);
+
+
+
+        }
     }
 }

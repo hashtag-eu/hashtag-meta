@@ -2,12 +2,12 @@
   "profiles": {
     "HashtagMeta.CLI.Create": {
       "commandName": "Project",
-      "commandLineArgs": "create -i . -t Folder -fvw",
+      "commandLineArgs": "create -i ..\\..\\..\\HashtagMeta.Test\\Resources\\Files\\Test -fvw",
       "workingDirectory": ""
     },
     "HashtagMeta.CLI.CreateZip": {
       "commandName": "Project",
-      "commandLineArgs": "create x:\\HASHTAG1.txt -i x:\\Tasks_2026-02-11_14-11-29.zip -t Zip -fvw",
+      "commandLineArgs": "create HTMETA.TXT -i ..\\..\\..\\HashtagMeta.Test\\Resources\\Files\\Test -z x:\\hashtagzipped.zip -p z42tiCpEtJnq8G8TkGQU2ibhsah3FwxLQWcAngano8GhEQVm -k zDnaeXViy7xZj5bxBjh3LHeGQ84yr2aFaA52ZNcM1QfnfRtZU -fvw",
       "workingDirectory": ""
     },
     "HashtagMeta.CLI.CreateKey": {
@@ -23,6 +23,11 @@
     "HashtagMeta.CLI.Verify": {
       "commandName": "Project",
       "commandLineArgs": "verify hashtag_meta.json -k zDnaeXViy7xZj5bxBjh3LHeGQ84yr2aFaA52ZNcM1QfnfRtZU -vw",
+      "workingDirectory": ""
+    },
+    "HashtagMeta.CLI.VerifyZip": {
+      "commandName": "Project",
+      "commandLineArgs": "verify HTMETA.TXT -i x:\\hashtagzipped.zip -k zDnaeXViy7xZj5bxBjh3LHeGQ84yr2aFaA52ZNcM1QfnfRtZU -vw",
       "workingDirectory": ""
     }
   }

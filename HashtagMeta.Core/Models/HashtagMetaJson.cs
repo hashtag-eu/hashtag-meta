@@ -24,12 +24,15 @@ public record HashtagMetaJson {
 
     public string ToJson() => JsonSerializer.Serialize(this, HashtagSerializeOptions);
 
-    public static HashtagMetaJson? FromJson(FileInfo fi) {
+    public static HashtagMetaJson? FromJsonFile(FileInfo fi) {
         using var si = fi.OpenRead();
         var htData = JsonSerializer.Deserialize<HashtagMetaJson>(si);
         return htData;
     }
-    public static HashtagMetaJson? FromJson(string s) {
+    public static HashtagMetaJson? FromJsonFile(string fileName) {
+        return FromJsonFile(new FileInfo(fileName));
+    }
+    public static HashtagMetaJson? FromJsonString(string s) {
         var htData = JsonSerializer.Deserialize<HashtagMetaJson>(s);
         return htData;
     }
