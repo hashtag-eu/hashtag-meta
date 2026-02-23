@@ -7,7 +7,6 @@ namespace HashtagMeta.Core.Services;
 
 public class HashtagCalculator {
     private List<FileInfo> _files = [];
-    private HashtagMetaJson _hashtagMetaJson = new();
 
     public HashtagCalculator(params string[] fileNames) {
         _files = [.. fileNames.Select(f => new FileInfo(f))];
@@ -19,11 +18,9 @@ public class HashtagCalculator {
         }
     }
 
-    public HashtagData CreateHashtagData(string? dataJson = null) {
+    public HashtagData CreateHashtagData(HashtagMetaJson? template = null) {
 
-        HashtagData data = dataJson != null
-            ? JsonSerializer.Deserialize<HashtagData>(dataJson) ?? new()
-            : new();
+        var data = template?.Data?.CloneData() ?? new();
 
         if (_files.Count > 0) {
             foreach (FileInfo file in _files) {
@@ -36,11 +33,11 @@ public class HashtagCalculator {
     }
 
     public HashtagMetaJson CreateSignedHashtagJson(
-        string? dataJson,
         string privateKey,
-        string publicKey
+        string publicKey,
+        HashtagMetaJson? template = null
     ) {
-        var hashTagData = CreateHashtagData(dataJson);
+        var hashTagData = CreateHashtagData(template);
 
         //create CID for source if a source is provided:
         if (!string.IsNullOrWhiteSpace(hashTagData.Source)) {
@@ -59,12 +56,12 @@ public class HashtagCalculator {
 
     public FileInfo CreateSignedHashtagZipfile(
         string outputFileName,
-        string? dataJson,
         string privateKey,
         string publicKey,
-        string hashtagMetaFileName = "hashtag_meta.json"
+        string hashtagMetaFileName = "hashtag_meta.json",
+        HashtagMetaJson? template = null
     ) {
-        var hashTagJson = CreateSignedHashtagJson(dataJson, privateKey, publicKey);
+        var hashTagJson = CreateSignedHashtagJson(privateKey, publicKey, template);
 
         using var fs = new FileStream(outputFileName, FileMode.CreateNew);
         using var zipFile = new ZipArchive(fs, ZipArchiveMode.Create);

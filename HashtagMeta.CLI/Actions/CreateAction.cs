@@ -1,5 +1,7 @@
-﻿using HashtagMeta.Core.Services;
+﻿using HashtagMeta.Core.Models;
+using HashtagMeta.Core.Services;
 using System.IO.Compression;
+using System.Text.Json;
 
 namespace HashtagMeta.CLI.Actions;
 
@@ -15,7 +17,7 @@ public class CreateAction : ActionBase<CreateActionOptions> {
                 hashtagFiles = options.InputFiles;
                 break;
             case InputFileType.Zip:
-                //decompress to temp folder and calculate file CIDs
+                //decompress to temp folder and list the files
                 string? zipFile = null;
                 try {
                     zipFile = options.InputFiles.FirstOrDefault();
@@ -37,7 +39,7 @@ public class CreateAction : ActionBase<CreateActionOptions> {
                 }
                 break;
             case InputFileType.Folder:
-                //Calculate file CIDs for files in the folder
+                //List the files in the folder, except the metadata json file if it exists
                 var folderName = options.InputFiles.FirstOrDefault() ?? Directory.GetCurrentDirectory();
                 var di = new DirectoryInfo(folderName);
                 if (di.Exists) {
@@ -54,7 +56,14 @@ public class CreateAction : ActionBase<CreateActionOptions> {
 
         if (hashtagFiles.Any()) {
 
-            var htc = new HashtagCalculator([.. hashtagFiles]);
+            var calculator = new HashtagCalculator([.. hashtagFiles]);
+
+            HashtagMetaJson? dataTemplate = null;
+            if (File.Exists(options.Data)) {
+                dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(File.ReadAllBytes(options.Data));
+            } else {
+                dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(options.Data ?? "");
+            }
 
             if (options.ZipOutputFile != null && options.PrivateKey != null && options.PublicKey != null) {
                 //delete existing if overwriting
@@ -63,19 +72,19 @@ public class CreateAction : ActionBase<CreateActionOptions> {
                 }
 
                 //Create a zip file with the signed hashtag metadata file and the input files to the file path specified
-                var zipfile = htc.CreateSignedHashtagZipfile(
+                var zipfile = calculator.CreateSignedHashtagZipfile(
                     options.ZipOutputFile,
-                    options.Data,
                     options.PrivateKey,
                     options.PublicKey,
-                    options.MetadataFile
+                    options.MetadataFile,
+                    dataTemplate
                 );
                 Console.WriteLine($"Zip file with signed metadata created ({zipfile.FullName})");
 
             } else {
                 var htMeta = options.PrivateKey != null && options.PublicKey != null
-                    ? htc.CreateSignedHashtagJson(options.Data, options.PrivateKey, options.PublicKey)
-                    : new() { Data = htc.CreateHashtagData() };
+                    ? calculator.CreateSignedHashtagJson(options.PrivateKey, options.PublicKey, dataTemplate)
+                    : new() { Data = calculator.CreateHashtagData() };
 
                 var htMetaJson = htMeta.ToJson();
                 Console.WriteLine($"New metadata file created [{options.MetadataFile}]:");
@@ -92,7 +101,6 @@ public class CreateAction : ActionBase<CreateActionOptions> {
                     Console.WriteLine(ex.Message);
                 }
             }
-
             return 0;
         }
         Console.WriteLine("Incorrect number of arguments, the init operation needs either a folder or a list of files");

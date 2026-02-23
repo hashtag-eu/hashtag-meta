@@ -17,7 +17,7 @@ public class CreateActionOptions: ActionOptionsBase {
     [Option('f', "force", Default = false, HelpText = "Force creation of the hashtag metadata or zip file, overwrite existing file.")]
     public bool Force { get; set; } = false;
 
-    [Option('d', "data", HelpText = "Initial data block contents for the metadata file.")]
+    [Option('d', "data", HelpText = "Initial contents for the metadata file either as raw JSON or a file name.")]
     public string? Data { get; set; }
 
     [Option('p', "private-key", Required = false, HelpText = "Private key (Multibase syntax)")]

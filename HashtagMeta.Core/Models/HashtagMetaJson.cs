@@ -1,10 +1,10 @@
 ﻿using HashtagMeta.Core.DnProto;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HashtagMeta.Core.Models;
-
 
 public record HashtagMetaJson {
     public static readonly JsonSerializerOptions HashtagSerializeOptions = new() {
@@ -65,6 +65,19 @@ public record HashtagData {
         var hash = SHA256.HashData(byteData);
 
         return hash;
+    }
+
+    /// <summary>
+    /// Clone the data part of this instance
+    /// </summary>
+    /// <returns></returns>
+    public HashtagData CloneData() {
+        return new() {
+            Issuer = Issuer,
+            Tags = Tags?.ToDictionary(t => t.Key, t => t.Value),
+            Source = Source,
+            Files = []
+        };
     }
 }
 

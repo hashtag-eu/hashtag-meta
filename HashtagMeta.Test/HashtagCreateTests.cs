@@ -9,7 +9,7 @@ namespace HashtagMeta.Test;
 [TestClass]
 public sealed class HashtagCreateTests {
     const string testFilesFolder = @"./Resources/Files/Test";
-    private static string _testOutputPath = "../../../TestOutput";
+    private const string _testOutputPath = "../../../TestOutput";
 
     [TestMethod]
     public void CreateFromFolderTest() {
@@ -38,10 +38,13 @@ public sealed class HashtagCreateTests {
         var privateKey = keyPair.PrivateKeyMultibase;
         var publicKey = keyPair.PublicKeyMultibase;
 
-
-        var dataJson = """
-            {"issuer":"did:web:farmmaps.eu","source":"https://www.farmmaps.eu","tags":{"key1":"value1", "key2":"value2"}}
-            """;
+        var template = new HashtagMetaJson {
+            Data = new() {
+                Issuer = "did:web:farmmaps.eu",
+                Source = "https://www.farmmaps.eu",
+                Tags = new() { { "key1", "value1" }, { "key2", "value2" } }
+            }
+        };
 
         var outputDir = new DirectoryInfo(Path.Combine(_testOutputPath, nameof(CreateSignedHashtagZipfileTest)));
         outputDir.Create();
@@ -52,14 +55,14 @@ public sealed class HashtagCreateTests {
         }
         const string htmetaJsonName = "HASHTAG1.TXT";
 
-        var inputJson = htc.CreateSignedHashtagJson(dataJson, privateKey, publicKey).ToJson();
+        var inputJson = htc.CreateSignedHashtagJson(privateKey, publicKey, template).ToJson();
 
         var zipFile = htc.CreateSignedHashtagZipfile(
             outputFileName,
-            dataJson,
             privateKey,
             publicKey,
-            htmetaJsonName
+            htmetaJsonName,
+            template
         );
 
         Assert.IsTrue(zipFile.Exists);
@@ -87,11 +90,12 @@ public sealed class HashtagCreateTests {
             Path.Combine(testFilesFolder, "icon.png")
         ]);
 
-        var dataJson = """
-            {"issuer":"did:web:farmmaps.eu","source":"https://www.farmmaps.eu","tags":{"key1":"value1", "key2":"value2"}}
-            """;
-
-        var htdata = htc.CreateHashtagData(dataJson);
+        var template = new HashtagData {
+            Issuer = "did:web:farmmaps.eu",
+            Source = "https://www.farmmaps.eu",
+            Tags = new() { { "key1", "value1" }, { "key2", "value2" } }
+        };
+        var htdata = htc.CreateHashtagData(new() { Data = template });
 
         Assert.IsNotNull(htdata);
 
@@ -115,12 +119,18 @@ public sealed class HashtagCreateTests {
         ]);
 
         var keyPair = KeyPair.Generate(KeyTypes.P256);
+        var template = new HashtagData {
+            Issuer = "did:web:farmmaps.eu",
+            Source = "https://www.farmmaps.eu",
+            Tags = new() { { "key1", "value1" }, { "key2", "value2" } }
+        };
 
-        var dataJson = """
-            {"issuer":"did:web:farmmaps.eu","source":"https://www.farmmaps.eu","tags":{"key1":"value1", "key2":"value2"}}
-            """;
+        var htjson = htc.CreateSignedHashtagJson(
+            keyPair.PrivateKeyMultibase,
+            keyPair.PublicKeyMultibase,
+            new() { Data = template }
+        );
 
-        var htjson = htc.CreateSignedHashtagJson(dataJson, keyPair.PrivateKeyMultibase, keyPair.PublicKeyMultibase);
         var htdata = htjson.Data;
         Assert.IsNotNull(htdata);
 
