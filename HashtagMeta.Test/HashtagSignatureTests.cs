@@ -1,5 +1,6 @@
 ﻿using HashtagMeta.Core.DnProto;
 using HashtagMeta.Test.Models;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -8,7 +9,8 @@ namespace HashtagMeta.Test {
     public class HashtagSignatureTests {
         private static JsonSerializerOptions DeserOptions = new() {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip
         };
 
         [TestMethod]
@@ -16,16 +18,16 @@ namespace HashtagMeta.Test {
             using FileStream fs = File.OpenRead("./Resources/SignTests/signature-fixtures.json");
 
             var testData = JsonSerializer.Deserialize<List<SignatureTestModel>>(fs, DeserOptions);
-
             foreach (var test in testData) {
                 System.Diagnostics.Debug.WriteLine($"Testing: {test.Comment}");
 
-                var hash = Convert.FromBase64String(test.MessageBase64);
+                var message = Convert.FromBase64String(test.MessageBase64);
+                var messageHash = SHA256.HashData(message);
                 var signature = Convert.FromBase64String(test.SignatureBase64);
 
-                var valid = Signer.ValidateHash(test.PublicKeyMultibase, hash, signature);
+                var valid = Signer.ValidateHash(test.PublicKeyMultibase, messageHash, signature);
 
-                //Assert.AreEqual(test.ValidSignature, valid);
+                Assert.AreEqual(test.ValidSignature, valid);
             }
         }
 
