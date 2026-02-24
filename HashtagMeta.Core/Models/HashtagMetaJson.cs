@@ -1,5 +1,4 @@
 ﻿using HashtagMeta.Core.DnProto;
-using System.Numerics;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -7,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace HashtagMeta.Core.Models;
 
 public record HashtagMetaJson {
-    public static readonly JsonSerializerOptions HashtagSerializeOptions = new() {
+    public static readonly JsonSerializerOptions VerboseSerializeOptions = new() {
         AllowTrailingCommas = true,
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
@@ -16,13 +15,28 @@ public record HashtagMetaJson {
         NewLine = "\x0A",
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
+    /// <summary>
+    /// Use serializer to calculate DagCbor hash to ignore null values
+    /// </summary>
+    public static readonly JsonSerializerOptions CompactSerializeOptions = new() {
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        WriteIndented = false,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
     [JsonPropertyName("data")]
     public HashtagData Data { get; set; } = new();
     [JsonPropertyName("sig")]
     public byte[] Signature { get; set; } = [];
 
-    public string ToJson() => JsonSerializer.Serialize(this, HashtagSerializeOptions);
+    public string ToJson(bool pretty = false) {
+        return JsonSerializer.Serialize(
+            this,
+            pretty ? VerboseSerializeOptions : CompactSerializeOptions
+        );
+    }
+
+    public byte[] ToUtf8Bytes() => JsonSerializer.SerializeToUtf8Bytes(this, CompactSerializeOptions);
 
     public static HashtagMetaJson? FromJsonFile(FileInfo fi) {
         using var si = fi.OpenRead();
@@ -42,13 +56,14 @@ public record HashtagData {
     [JsonPropertyName("issuer")]
     public string Issuer { get; set; } = string.Empty;
     [JsonPropertyName("tags")]
-    public Dictionary<string, string>? Tags { get; set; }
+    public Dictionary<string, string> Tags { get; set; } = [];
     [JsonPropertyName("source")]
-    public string? Source { get; set; }
+    public string? Source { get; set; } = null;
     [JsonPropertyName("sourceCid")]
-    public string? SourceCID { get; set; }
+    public string? SourceCID { get; set; } = null;
     [JsonPropertyName("files")]
     public Dictionary<string, HashtagFile> Files { get; set; } = [];
+
 
     /// <summary>
     /// Create DagCbor object from this instance
@@ -59,7 +74,7 @@ public record HashtagData {
     /// </summary>
     /// <returns>SHA256 hash of the DagCbor bytes of this instance as JSON</returns>
     public byte[] CalculateDagCborHash() {
-        var dataJson = JsonSerializer.Serialize(this);
+        var dataJson = JsonSerializer.Serialize(this, HashtagMetaJson.CompactSerializeOptions);
         var dagCbor = DagCborObject.FromJsonString(dataJson);
         var byteData = dagCbor.ToBytes();
         var hash = SHA256.HashData(byteData);
@@ -74,7 +89,7 @@ public record HashtagData {
     public HashtagData CloneData() {
         return new() {
             Issuer = Issuer,
-            Tags = Tags?.ToDictionary(t => t.Key, t => t.Value),
+            Tags = Tags.ToDictionary(t => t.Key, t => t.Value),
             Source = Source,
             Files = []
         };

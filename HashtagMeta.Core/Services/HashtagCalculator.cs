@@ -1,7 +1,6 @@
 ﻿using HashtagMeta.Core.Helpers;
 using HashtagMeta.Core.Models;
 using System.IO.Compression;
-using System.Text.Json;
 
 namespace HashtagMeta.Core.Services;
 
@@ -66,14 +65,14 @@ public class HashtagCalculator {
         using var fs = new FileStream(outputFileName, FileMode.CreateNew);
         using var zipFile = new ZipArchive(fs, ZipArchiveMode.Create);
 
-        foreach(var f in _files) {
+        foreach (var f in _files) {
             zipFile.CreateEntryFromFile(f.FullName, f.Name);
         }
         //create entry for the hashtag meta Json
         var htmetazip = zipFile.CreateEntry(hashtagMetaFileName);
 
         using var metafs = htmetazip.Open();
-        metafs.Write(JsonSerializer.SerializeToUtf8Bytes(hashTagJson));
+        metafs.Write(hashTagJson.ToUtf8Bytes());
 
         return new(outputFileName);
     }

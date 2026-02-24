@@ -59,10 +59,18 @@ public class CreateAction : ActionBase<CreateActionOptions> {
             var calculator = new HashtagCalculator([.. hashtagFiles]);
 
             HashtagMetaJson? dataTemplate = null;
-            if (File.Exists(options.Data)) {
-                dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(File.ReadAllBytes(options.Data));
-            } else {
-                dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(options.Data ?? "");
+
+            if (!string.IsNullOrEmpty(options.Data)) {
+                if (File.Exists(options.Data)) {
+                    dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(File.ReadAllBytes(options.Data));
+                } else {
+                    try {
+                        dataTemplate = JsonSerializer.Deserialize<HashtagMetaJson>(options.Data ?? "{}");
+                    } catch (Exception ex) {
+                        Console.WriteLine($"Data template is not a valid file or valid JSON");
+                        Console.WriteLine(ex.Message);
+                    }
+                }
             }
 
             if (options.ZipOutputFile != null && options.PrivateKey != null && options.PublicKey != null) {

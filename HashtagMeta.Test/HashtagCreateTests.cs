@@ -184,7 +184,7 @@ public sealed class HashtagCreateTests {
 
     [TestMethod]
     public void CalculateMetadataJsonHashTest() {
-        const string validHash = "GbLdsnAy0O8gm3AGs32OozmYx17Q9Glfa+7ayDRSKWQ=";
+        const string validHash = "ygaVx53zYxmfxsZRbOYJNXbO8DJ2TNS+p2PPQXlVMt8=";
 
         string[] jsonLiterals = [
            """{"data":{"issuer":"diddfdf","source":"sffdsffs fa","tags":{"key1":"value1","key2":"value 2"}}}""",
