@@ -16,7 +16,7 @@ public class SignAction : ActionBase<SignActionOptions> {
                 var serialized = htJson.ToJson();
                 Console.WriteLine("Signed metadata file:");
                 Console.WriteLine();
-                Console.WriteLine(serialized);
+                Console.WriteLine(htJson.ToJson(true));
 
                 File.WriteAllText(options.MetadataFile, serialized);
                 return 0;

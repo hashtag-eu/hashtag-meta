@@ -92,12 +92,12 @@ public class CreateAction : ActionBase<CreateActionOptions> {
             } else {
                 var htMeta = options.PrivateKey != null && options.PublicKey != null
                     ? calculator.CreateSignedHashtagJson(options.PrivateKey, options.PublicKey, dataTemplate)
-                    : new() { Data = calculator.CreateHashtagData() };
+                    : new() { Data = calculator.CreateHashtagData(dataTemplate) };
 
                 var htMetaJson = htMeta.ToJson();
                 Console.WriteLine($"New metadata file created [{options.MetadataFile}]:");
                 Console.WriteLine();
-                Console.WriteLine(htMetaJson);
+                Console.WriteLine(htMeta.ToJson(true));
                 File.WriteAllText(options.MetadataFile, htMetaJson);
             }
 
