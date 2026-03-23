@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
+    <File Path="DESIGN.md" />
     <File Path="README.md" />
   </Folder>
   <Project Path="HashtagMeta.CLI/HashtagMeta.CLI.csproj" />
