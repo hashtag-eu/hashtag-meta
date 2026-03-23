@@ -38,11 +38,6 @@ public class HashtagCalculator {
     ) {
         var hashTagData = CreateHashtagData(template);
 
-        //create CID for source if a source is provided:
-        if (!string.IsNullOrWhiteSpace(hashTagData.Source)) {
-            hashTagData.SourceCID = HashtagFunctions.CreateCID(hashTagData.Source);
-        }
-
         var signedBytes = hashTagData.GetSignature(privateKey, publicKey);
 
         var hashTagJson = new HashtagMetaJson {

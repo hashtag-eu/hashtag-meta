@@ -1,4 +1,5 @@
-﻿using HashtagMeta.Core.Helpers;
+﻿using HashtagMeta.Core.DnProto;
+using HashtagMeta.Core.Helpers;
 
 namespace HashtagMeta.Test {
     [TestClass]
@@ -15,6 +16,23 @@ namespace HashtagMeta.Test {
             Assert.AreEqual(fileCid, textCid);
 
             testFile.Delete();
+        }
+
+        [TestMethod]
+        public void ValidateFileCidCalculationTest() {
+
+            var fi = new FileInfo(@"./Resources/Files/hashtag_eo_raster.tif");
+
+            var cidV1 = CidV1.GenerateForBlobBytes(File.ReadAllBytes(fi.FullName));
+            var cidV1String = cidV1.Base32;
+
+            var fileCid = HashtagFunctions.CreateCID(fi);
+
+            Assert.AreEqual(cidV1String, fileCid);
+
+            Assert.AreEqual("bafkreif5ksalqe362rge3h4aikxbnslzibzihzlwsry26dyvgeolgznbcm", cidV1String);
+            Assert.AreEqual("bafkreif5ksalqe362rge3h4aikxbnslzibzihzlwsry26dyvgeolgznbcm", fileCid);
+
         }
     }
 }

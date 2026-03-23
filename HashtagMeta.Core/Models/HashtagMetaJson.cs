@@ -60,7 +60,7 @@ public record HashtagData {
     [JsonPropertyName("source")]
     public string? Source { get; set; } = null;
     [JsonPropertyName("sourceCid")]
-    public string? SourceCID { get; set; } = null;
+    public string? SourceCid { get; set; } = null;
     [JsonPropertyName("files")]
     public Dictionary<string, HashtagFile> Files { get; set; } = [];
 

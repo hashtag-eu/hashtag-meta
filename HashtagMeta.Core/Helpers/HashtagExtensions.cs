@@ -8,6 +8,11 @@ namespace HashtagMeta.Core.Helpers {
                 var signingFunction = Signer.CreateCommitSigningFunction(privateKey, publicKey);
 
                 if (hashtagData != null) {
+                    //create CID for source if a source is provided:
+                    if (!string.IsNullOrWhiteSpace(hashtagData.Source)) {
+                        hashtagData.SourceCid = HashtagFunctions.CreateCID(hashtagData.Source);
+                    }
+
                     var hash = hashtagData.CalculateDagCborHash();
                     var signedBytes = signingFunction(hash);
 
@@ -85,7 +90,7 @@ namespace HashtagMeta.Core.Helpers {
             if (htData.Data.Source != null) {
                 var sourceCid = HashtagFunctions.CreateCID(htData.Data.Source);
 
-                if (sourceCid != htData.Data.SourceCID) {
+                if (sourceCid != htData.Data.SourceCid) {
                     errors.Add($"Source: calculated CID does not match source CID in metadata.");
                 }
             }
