@@ -1,0 +1,32 @@
+{
+  "data": {
+    "issuer": "did:web:hashtag.terrasphere.space",
+    "files": {
+      "hashtag_eo_raster_632e425c_20260219_212629.tif": {
+        "cid": "bafkreif5ksalqe362rge3h4aikxbnslzibzihzlwsry26dyvgeolgznbcm"
+      }
+    },
+    "source": "https://terrasphere.space",
+    "sourceCid": "bafkreidli2k6wgihz5sagy62gwgqraoqf6skow7we2fxmj4l5v6rz5jbse",
+    "tags": {
+      "source_order": "JSON with parameters given in original payload",
+      "process_graph": "JSON with process graph used at the CDSE background to select and compute EO product from Earth Observation data",
+      "eo_product": "GEOTIFF file with EO product suitable for creating task / prescription maps",
+      "eo_product_cid": "bafkreihc4hrpcocqqskzb5clg7tnb55c42xpm62sb3dfmqozslvy4wtqam",
+      "eo_product_cid_at": "2026-02-19T21:02:01.020972+00:00",
+      "proof_type": "JsonWebSignature2020",
+      "proof_created": "2026-02-19T21:28:33+00:00Z",
+      "proof_verificationMethod": "did:web:hashtag.terrasphere.space#key-1",
+      "proof_proofPurpose": "assertionMethod",
+      "proof_digest": "bafkreiepzoqd5ymsxymvgcojnakggqjxhmfgdug4rkt5rjxhd3dsg67nfm",
+      "proof_signatureValue": "27YjJMcib5JuY0YSmin8G74Umuxo-IcFQsQULbHnNncHLT_nYsmk3SA7UZEsmZNb6hhGCugUQxObcDDiRyouLg",
+      "source_order_id": "632e425c-3a0e-4413-ad03-e9dbe93d0517",
+      "source_order_cid": "bafkreifkwbqxv4n2rh6gjhqxnr32ybeofy6vnrhz7uwgv7hfx26o3sopvm",
+      "source_order_cid_at": "2026-02-19T21:02:01.020969+00:00",
+      "process_graph_id": "dd27bcf2-b22a-4ddd-b96b-b9de3771e91c",
+      "process_graph_cid": "bafkreihkntf7a447rhlxfwgnrzowkgygtkb72t2tocvai5wc7vsoelxe44",
+      "process_graph_cid_at": "2026-02-19T21:02:01.020971+00:00"
+    }
+  },
+  "sig": "YEgpe1Tq0W1WcWOkjVMOa6+EJ7pz3HjvZiEtCGQFAPjNYmDsO2c32E1c9vkfkGDhJAecTcSv4Xb+g7inZjmRhQ=="
+}
